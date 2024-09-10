@@ -227,5 +227,3 @@ ORDER BY content DESC;
 - **Most Common Ratings**: Ratings insights help in understanding the content's target audience and popularity.
 - **Geographical Insights**: The top countries and content release trends provide a regional perspective.
 - **Content Categorization**: The analysis of keywords such as 'kill' and 'violence' assists in categorizing and understanding the nature of Netflix's content.
-
-This SQL-based analysis provides crucial insights into Netflix’s catalog and can assist in decision-making for content strategies and customer targeting.

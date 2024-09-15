@@ -10,7 +10,7 @@ This project conducts an in-depth analysis of Netflix's movies and TV shows data
 - Explore and categorize content based on keywords.
 
 ## Dataset
-The data for this analysis is sourced from Netflix’s public dataset available on Kaggle. It contains information on movies and TV shows, including title, director, cast, country, release year, duration, genre, and more.
+The data for this analysis is sourced from Netflix’s public dataset available on Kaggle. [https://www.kaggle.com/datasets/shivamb/netflix-shows?resource=download]
 
 ## Schema
 ```sql
@@ -44,7 +44,7 @@ FROM netflix
 GROUP BY type 
 ORDER BY type;
 ```
-**Objective**: Determine the distribution of content types on Netflix.
+![image](https://github.com/user-attachments/assets/f6d260b4-7b15-4814-ade3-bd47646ec368)
 
 ---
 
@@ -63,7 +63,7 @@ SELECT type, rating, common_rating
 FROM cte 
 WHERE rn = 1;
 ```
-**Objective**: Identify the most frequently occurring rating for each type of content.
+![image](https://github.com/user-attachments/assets/2c647974-bdbe-44aa-94c3-bab047073f38)
 
 ---
 
@@ -74,7 +74,7 @@ FROM netflix
 WHERE type = 'Movie' 
   AND release_year = 2020;
 ```
-**Objective**: Retrieve all movies released in the year 2020.
+![image](https://github.com/user-attachments/assets/68e89c07-867f-426e-8e19-c516ec9fd2ba)
 
 ---
 
@@ -92,18 +92,26 @@ WHERE Country IS NOT NULL
 ORDER BY country_count DESC
 LIMIT 5;
 ```
-**Objective**: Identify the top 5 countries with the most content on Netflix.
+![image](https://github.com/user-attachments/assets/bf0cd7f2-682d-4412-9009-4380c09acd60)
 
 ---
 
-### 5. Identify the Longest Movie
+### 5. Identify top 10 Longest Movie
 ```sql
-SELECT * 
-FROM netflix
-WHERE type = 'Movie' 
-ORDER BY CAST(SPLIT_PART(duration, ' ', 1) AS INT) DESC;
+with cte as (SELECT 
+		Title,release_year,rating,duration,row_number() over(order by CAST(split_part(duration, ' ', 1) AS int ) DESC) AS RN
+FROM 
+	netflix
+WHERE 
+	type = 'Movie' and  duration is not null)
+SELECT
+	* 
+FROM 
+	CTE 
+WHERE 
+	RN<=10;
 ```
-**Objective**: Find the movie with the longest duration.
+![image](https://github.com/user-attachments/assets/1c058159-2d12-4629-857f-caf0d0393c31)
 
 ---
 
@@ -115,29 +123,37 @@ GROUP BY release_year
 ORDER BY release_year DESC 
 LIMIT 5;
 ```
-**Objective**: Retrieve content added to Netflix in the last 5 years.
+![image](https://github.com/user-attachments/assets/b4f6a0b3-9e48-40f7-98af-947e3d67e55f)
 
 ---
 
 ### 7. Find All Movies/TV Shows by Director 'Rajiv Chilaka'
 ```sql
-SELECT *
-FROM netflix
-WHERE director ILIKE '%Rajiv Chilaka%';
+select 
+	TITLE,DIRECTOR,RELEASE_YEAR
+From
+	netflix
+where 
+	director ilike '%Rajiv Chilaka%'
+ORDER BY
+	RELEASE_YEAR ASC;
 ```
-**Objective**: List all content directed by 'Rajiv Chilaka'.
+![image](https://github.com/user-attachments/assets/49c2a1fb-4d84-442e-ab5a-dac13dca05cb)
 
 ---
 
 ### 8. List All TV Shows with More Than 5 Seasons
 ```sql
-SELECT title, duration 
-FROM netflix
-WHERE type = 'TV Show' 
-  AND CAST(SPLIT_PART(duration, ' ', 1) AS INT) > 5 
-ORDER BY CAST(SPLIT_PART(duration, ' ', 1) AS INT) DESC;
+select 
+	title,duration 
+from 
+	netflix
+WHERE 
+	type='TV Show' and CAST(split_part(duration, ' ', 1) AS int) >= 10 
+ORDER BY 
+	2 DESC;
 ```
-**Objective**: Identify TV shows with more than 5 seasons.
+![image](https://github.com/user-attachments/assets/a8db08d9-94ef-4324-98b8-423c765a0a9e)
 
 ---
 
@@ -166,11 +182,14 @@ WHERE listed_in ILIKE '%Documentaries%';
 
 ### 12. Find All Content Without a Director
 ```sql
-SELECT * 
-FROM netflix
-WHERE director IS NULL;
+select
+	TYPE,SUM(CASE WHEN DIRECTOR IS NULL THEN 1 ELSE 0 END) AS WITHOUT_DIRECTOR
+from
+	netflix
+GROUP BY
+	1;
 ```
-**Objective**: List all content that does not have a director.
+![image](https://github.com/user-attachments/assets/e30fa688-7844-4b59-af23-7df7e012940d)
 
 ---
 
@@ -181,7 +200,7 @@ FROM netflix
 WHERE casts ILIKE '%Salman Khan%' 
   AND release_year > EXTRACT(YEAR FROM CURRENT_DATE) - 10;
 ```
-**Objective**: Count the number of movies featuring 'Salman Khan' in the last 10 years.
+![image](https://github.com/user-attachments/assets/0cd62739-0db9-45ca-9f7d-e73c067d4669)
 
 ---
 
@@ -189,19 +208,25 @@ WHERE casts ILIKE '%Salman Khan%'
 ```sql
 WITH cte AS (
     SELECT
-        UNNEST(STRING_TO_ARRAY(country, ',')) AS country,
-        UNNEST(STRING_TO_ARRAY(casts, ',')) AS actor,
+        unnest(string_to_array(country, ',')) AS countrys,
+        unnest(string_to_array(casts, ',')) AS actor,
         *
-    FROM netflix
+    FROM
+        netflix
 )
-SELECT actor, COUNT(*) 
-FROM cte 
-WHERE country = 'India'
-GROUP BY actor 
-ORDER BY COUNT(*) DESC 
+SELECT 
+    actor, COUNT(*) 
+FROM 
+    cte 
+WHERE 
+    countrys = 'India' AND actor is not null
+GROUP BY 
+    actor 
+ORDER BY 
+    COUNT(*) DESC 
 LIMIT 10;
 ```
-**Objective**: Identify the top 10 actors with the most appearances in Indian-produced movies.
+![image](https://github.com/user-attachments/assets/a9eaf5cd-7434-4aa4-b331-f80cfab83190)
 
 ---
 
@@ -218,7 +243,7 @@ FROM netflix
 GROUP BY Category
 ORDER BY content DESC;
 ```
-**Objective**: Categorize content as 'Bad' if it contains 'kill' or 'violence' and 'Good' otherwise.
+![image](https://github.com/user-attachments/assets/63cdf372-2cd9-43e3-b009-79e395d191e5)
 
 ---
 

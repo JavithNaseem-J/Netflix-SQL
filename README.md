@@ -159,16 +159,39 @@ ORDER BY
 
 ### 9. Count the Number of Content Items in Each Genre
 ```sql
-SELECT 
-    UNNEST(STRING_TO_ARRAY(listed_in, ',')) AS Listed_in, 
-    COUNT(*) 
-FROM netflix
-GROUP BY Listed_in
-ORDER BY COUNT(*) DESC;
+WITH CTE AS (select 
+	trim(unnest(string_to_array(listed_in,','))) as Listed_in
+from 
+	netflix)
+SELECT
+	listed_in,count(*)
+FROM
+	CTE
+GROUP BY 
+	1
+ORDER BY
+	2 DESC;
 ```
-**Objective**: Count the number of content items in each genre.
+![image](https://github.com/user-attachments/assets/49e858f9-1086-4108-842e-a319c7ccafb1)
 
 ---
+
+### 10.Find each year and the average numbers of content release in India on netflix.
+```sql
+SELECT 
+	COUNTRY,RELEASE_YEAR,COUNT(*) AS NO_OF_CONTENT,
+	ROUND(CAST(COUNT(*)AS NUMERIC)/(SELECT COUNT(*) FROM NETFLIX WHERE COUNTRY='India')*100,2)
+FROM 
+	NETFLIX
+WHERE 
+	COUNTRY='India'
+GROUP BY 
+	1,2
+ORDER BY 
+	3 DESC LIMIT 5;
+```
+![image](https://github.com/user-attachments/assets/462e0ec6-efb7-4b3f-a149-15fc4cf55844)
+
 
 ### 11. List All Movies that are Documentaries
 ```sql
@@ -176,8 +199,9 @@ SELECT *
 FROM netflix
 WHERE listed_in ILIKE '%Documentaries%';
 ```
-**Objective**: Retrieve all movies classified as documentaries.
+![image](https://github.com/user-attachments/assets/5d743f0b-0d33-4ad5-b24d-5e28357b3ca0)
 
+850+ movies classified as documentaries.
 ---
 
 ### 12. Find All Content Without a Director

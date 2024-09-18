@@ -201,7 +201,7 @@ WHERE listed_in ILIKE '%Documentaries%';
 ```
 ![image](https://github.com/user-attachments/assets/5d743f0b-0d33-4ad5-b24d-5e28357b3ca0)
 
-850+ movies classified as documentaries.
+###### 850+ movies classified as documentaries.
 ---
 
 ### 12. Find All Content Without a Director

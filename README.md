@@ -12,7 +12,6 @@ This project conducts an in-depth analysis of Netflix's movies and TV shows data
 ## Dataset
 The data for this analysis is sourced from Netflix’s public dataset available on [Kaggle](https://www.kaggle.com/datasets/shivamb/netflix-shows?resource=download).
 
-## Schema
 ```sql
 DROP TABLE IF EXISTS netflix;
 
